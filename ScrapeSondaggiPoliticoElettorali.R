@@ -34,7 +34,7 @@ CalculateIterationsRequired <- function(remDr, table.size) {
   return(iterations)
 }
 
-rD <- rsDriver(browser="firefox", port=5858L, verbose=F)
+rD <- rsDriver(browser="firefox", port=1234L, verbose=F)
 remDr <- rD[["client"]]
 
 lista_sondaggi <- list()
@@ -44,7 +44,8 @@ remDr$navigate("http://sondaggipoliticoelettorali.it/ListaSondaggi.aspx?st=SONDA
 
 totale.numero.sondaggi <- CalculateIterationsRequired(remDr, 13)
 
-for (n.pagina in 1:5) {
+for (n.pagina in 1:length(totale.numero.sondaggi)) {
+  message(glue::glue("Pagine numero", n.pagina))
   numero.sondaggi <- totale.numero.sondaggi[n.pagina]
   for (riga in 1:numero.sondaggi) {
     if (n.pagina > 1) {

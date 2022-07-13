@@ -1,20 +1,20 @@
-WrangleAnswers <- function(answer) {
-  browser()
-  if (tibble::is_tibble(answer)) {
-    test <- answer |> 
+WrangleAnswers <- function(domanda) {
+  if (tibble::is_tibble(domanda$Risposta)) {
+    test <- domanda$Risposta |> 
       dplyr::pull("X1") |> 
       paste(collapse = "-")
   } else {
-    test <- answer 
+    test <- domanda$Risposta 
   }
-  test <- test |> 
-    grep("\\bPartito Democratico\\b|\\bPD\\b", 
-         x = _, ignore.case = TRUE,
-         value = TRUE) 
+
+  test <- grepl("\\bPartito Democratico\\b|\\bPD\\b", 
+         x = test, ignore.case = TRUE) & 
+    grepl("\\bForza Italia\\b|\\bFI\\b", 
+         x = test, ignore.case = TRUE)
   
-  if (length(test) == 1) {
-    test <- test |>
-      stringr::str_detect("^((?!Berlusconi).)*$")
+  if (test) {
+    test <- !grepl("fiducia|coalizion|gradimento", domanda$Testo, 
+                   ignore.case = TRUE) 
   } else {
     test <- FALSE
   }
@@ -25,26 +25,38 @@ WrangleAnswers <- function(answer) {
 
 FindElectoralPolls <- function(polls) {
   purrr::pluck(polls,  "Domande") |>
-    purrr::map(purrr::pluck("Risposta")) |> 
     purrr::map_lgl(WrangleAnswers)
 }
 
 a <- purrr::map(lista_nazionale, FindElectoralPolls)
 
-lista_nazionale[[2]] |>
-  purrr::pluck("Domande") |>
-  purrr::map(purrr::pluck("Risposta")) |>
-  purrr::map_lgl(WrangleAnswers)
+purrr::map(a, sum)
 
+# lista_nazionale[[1]] |>
+#   purrr::pluck("Domande") |>
+#   purrr::map(purrr::pluck("Risposta")) |>
+#   purrr::map_lgl(WrangleAnswers)
 # 
+# # 
+# # 
+# # 
+# ExtractNationalPolls <- function(polls) {
+#   index.nationals <- purrr::map_chr(polls,
+#                                     purrr::pluck("Estensione_Territoriale")) |>
+#     grep("italia|nazionale", x = _, ignore.case = TRUE)
 # 
+#   polls[index.nationals]
+# }
 # 
-ExtractNationalPolls <- function(polls) {
-  index.nationals <- purrr::map_chr(polls,
-                                    purrr::pluck("Estensione_Territoriale")) |>
-    grep("italia|nazionale", x = _, ignore.case = TRUE)
-
-  polls[index.nationals]
-}
-
-lista_nazionale <- ExtractNationalPolls(lista_sondaggi)
+# lista_nazionale <- ExtractNationalPolls(lista_sondaggi)
+# 
+# realizzatori <- purrr::map_chr(lista_nazionale, purrr::pluck("Realizzatore"))
+# 
+# lista_realizzatori <- realizzatori |> 
+#   unique()
+# 
+# lista_nazionale[realizzatori %in% lista_realizzatori[1]] |> 
+#   purrr::map(purrr::pluck("Domande")) |> 
+#   purrr::map(~purrr::map(.x, purrr::pluck("Testo"))) |> 
+#   purrr::flatten() |> 
+#   unlist()
