@@ -1,6 +1,6 @@
 library(RSelenium)
-library("rvest")
-library("tidyverse")
+library(rvest)
+library(tidyverse)
 
 ExtractStaticId <- function(remDr, name, date_flag = FALSE) {
   address <- "ctl00_Contenuto_ucGestioneSondaggio_ucDatiSondaggioReadOnly"

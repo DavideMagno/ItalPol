@@ -29,7 +29,7 @@ FindElectoralPolls <- function(polls) {
     purrr::map_lgl(WrangleAnswers)
 }
 
-# a <- purrr::map(lista_nazionale, FindElectoralPolls)
+a <- purrr::map(lista_nazionale, FindElectoralPolls)
 
 lista_nazionale[[2]] |>
   purrr::pluck("Domande") |>
@@ -39,13 +39,12 @@ lista_nazionale[[2]] |>
 # 
 # 
 # 
-# ExtractNationalPolls <- function(polls) {
-#   browser()
-#   index.nationals <- purrr::map_chr(polls, 
-#                                     purrr::pluck("Estensione_Territoriale")) |> 
-#     grep("italia|nazionale", x = _, ignore.case = TRUE)
-#   
-#   polls[index.nationals]
-# }
-# 
-# a <- ExtractNationalPolls(lista_sondaggi)
+ExtractNationalPolls <- function(polls) {
+  index.nationals <- purrr::map_chr(polls,
+                                    purrr::pluck("Estensione_Territoriale")) |>
+    grep("italia|nazionale", x = _, ignore.case = TRUE)
+
+  polls[index.nationals]
+}
+
+lista_nazionale <- ExtractNationalPolls(lista_sondaggi)
